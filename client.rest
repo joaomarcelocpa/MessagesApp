@@ -1,0 +1,58 @@
+@baseUrl = http://localhost:3000
+
+# Recados
+###
+GET {{baseUrl}}/recados/?limit=100&offset=100
+###
+GET {{baseUrl}}/recados/22
+###
+POST {{baseUrl}}/recados/
+Content-Type: application/json
+
+{
+  "texto": "Recado novo aí",
+  "deId": 7,
+  "paraId": 1
+}
+###
+PATCH {{baseUrl}}/recados/22
+Content-Type: application/json
+
+{
+  "texto": "Novo recado atualizado",
+  "lido": true
+}
+###
+DELETE {{baseUrl}}/recados/21
+
+
+
+
+
+
+# Pessoa
+###
+GET {{baseUrl}}/pessoas/?limit=100&offset=100
+###
+GET {{baseUrl}}/pessoas/1
+###
+POST {{baseUrl}}/pessoas/
+Content-Type: application/json
+
+{
+  "nome": "Alice",
+  "email": "alice@gmail.com",
+  "password": "carro123"
+}
+
+###
+PATCH {{baseUrl}}/pessoas/7
+Content-Type: application/json
+
+{
+  "nome": "Giovana",
+  "password": "moto123"
+}
+
+###
+DELETE {{baseUrl}}/pessoas/6
