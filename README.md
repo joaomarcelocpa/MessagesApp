@@ -15,5 +15,7 @@
 # Messages App: o que é?
 O Messages App é um aplicativo em desenvolvimento voltado para o envio e troca de mensagens entre os usuários, a partir de uma interface intuitiva e um armazenamento de dados consistente. Ele está sendo desenvolvido usando o framework Nest.JS, que deriva da linguagem Typescript para o backend, além de usar React.JS no frontend, framework também derivado do Typescript e o banco de dados usado é o PostgreSQL. Ambas as linguagens são voltadas para o desenvolvimento Web, portanto, são robustas para o ambiente a qual serão hospedadas.
 
+Falta arrumar: mensagens de erros precedentes da exclusão de recados e  marcação como lida, tela de edição que não abre e tela de visualizar detalhes que não abre
+
 # Desenvolvido por: 
 - João Marcelo Carvalho Pereira Araújo
