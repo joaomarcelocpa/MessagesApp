@@ -53,7 +53,7 @@ export class RecadosService {
 
 
   async findOne(id: number) {
-    const recado = await this.recadoRepository.findOne({ where: {id,},});
+    const recado = await this.recadoRepository.findOne({ where: {id,}, relations: ['de', 'para'] });
 
     if (recado) {
       return recado;
@@ -72,7 +72,15 @@ export class RecadosService {
     recado!.texto = updateRecadoDto?.texto ?? recado!.texto;
     recado!.lido = updateRecadoDto?.lido ?? recado!.lido;
     await this.recadoRepository.save(recado!);
-    return recado;
+
+    return await this.recadoRepository.findOne({
+      where: { id, },
+      relations: ['de', 'para'],
+      select: {
+        de: { id: true, nome: true },
+        para: { id: true, nome: true }
+      },
+    });
   }
 
 
