@@ -1,14 +1,15 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, use } from "react"
 import { ArrowLeft, Save } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { recadosService } from "@/services"
 import type { Recado, UpdateRecadoData } from "@/services"
 
-export default function EditarRecadoPage({ params }: { params: { id: string } }) {
+export default function EditarRecadoPage({ params }: { params: Promise<{ id: string }> }) {
     const router = useRouter()
+    const resolvedParams = use(params)
     const [recado, setRecado] = useState<Recado | null>(null)
     const [formData, setFormData] = useState<UpdateRecadoData>({
         texto: "",
@@ -22,7 +23,7 @@ export default function EditarRecadoPage({ params }: { params: { id: string } })
         const loadRecado = async () => {
             try {
                 setLoading(true)
-                const data = await recadosService.getById(parseInt(params.id))
+                const data = await recadosService.getById(parseInt(resolvedParams.id))
                 setRecado(data)
                 setFormData({
                     texto: data.texto,
@@ -36,10 +37,10 @@ export default function EditarRecadoPage({ params }: { params: { id: string } })
             }
         }
 
-        if (params.id) {
+        if (resolvedParams.id) {
             loadRecado()
         }
-    }, [params.id, router])
+    }, [resolvedParams.id, router])
 
     const validateForm = (): boolean => {
         const newErrors: Record<string, string> = {}
@@ -72,8 +73,8 @@ export default function EditarRecadoPage({ params }: { params: { id: string } })
                 lido: formData.lido,
             }
 
-            await recadosService.update(parseInt(params.id), updateData)
-            router.push(`/recados/${params.id}`)
+            await recadosService.update(parseInt(resolvedParams.id), updateData)
+            router.push(`/recados/${resolvedParams.id}`)
         } catch (error: any) {
             console.error("Erro ao atualizar recado:", error)
 
@@ -114,7 +115,7 @@ export default function EditarRecadoPage({ params }: { params: { id: string } })
             <div className="container mx-auto px-4 py-8 max-w-4xl">
                 <div className="mb-8">
                     <Link
-                        href={`/recados/${params.id}`}
+                        href={`/recados/${resolvedParams.id}`}
                         className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition-colors"
                     >
                         <ArrowLeft className="h-4 w-4" />
@@ -155,7 +156,7 @@ export default function EditarRecadoPage({ params }: { params: { id: string } })
         <div className="container mx-auto px-4 py-8 max-w-4xl">
             <div className="mb-8">
                 <Link
-                    href={`/recados/${params.id}`}
+                    href={`/recados/${resolvedParams.id}`}
                     className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition-colors"
                 >
                     <ArrowLeft className="h-4 w-4" />
@@ -177,10 +178,10 @@ export default function EditarRecadoPage({ params }: { params: { id: string } })
                     <h2 className="text-lg font-semibold text-gray-900 mb-4">Informações Atuais</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div>
-                            <span className="font-medium text-gray-700">De:</span> {recado.de.nome}
+                            <span className="font-medium text-gray-700">De:</span> {recado.de?.nome || 'Nome não disponível'}
                         </div>
                         <div>
-                            <span className="font-medium text-gray-700">Para:</span> {recado.para.nome}
+                            <span className="font-medium text-gray-700">Para:</span> {recado.para?.nome || 'Nome não disponível'}
                         </div>
                         <div>
                             <span className="font-medium text-gray-700">Enviado em:</span> {formatDateTime(recado.data)}
@@ -260,7 +261,7 @@ export default function EditarRecadoPage({ params }: { params: { id: string } })
                                     {saving ? "Salvando..." : "Salvar Alterações"}
                                 </button>
                                 <Link
-                                    href={`/recados/${params.id}`}
+                                    href={`/recados/${resolvedParams.id}`}
                                     className="flex-1 border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-md font-medium transition-colors text-center"
                                 >
                                     Cancelar

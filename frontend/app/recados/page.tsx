@@ -11,13 +11,22 @@ export default function RecadosPage() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [deletingId, setDeletingId] = useState<number | null>(null)
+    const [markingAsReadId, setMarkingAsReadId] = useState<number | null>(null)
 
     const loadRecados = async () => {
         try {
             setLoading(true)
             setError(null)
             const data = await recadosService.getAll()
-            setRecados(data)
+            // Verificar se os dados estão válidos
+            const validRecados = data.filter(recado =>
+                recado &&
+                recado.de &&
+                recado.para &&
+                recado.de.nome &&
+                recado.para.nome
+            )
+            setRecados(validRecados)
         } catch (err) {
             setError('Erro ao carregar recados')
             console.error('Erro ao carregar recados:', err)
@@ -49,13 +58,24 @@ export default function RecadosPage() {
 
     const handleMarkAsRead = async (id: number) => {
         try {
+            setMarkingAsReadId(id)
             const updatedRecado = await recadosService.markAsRead(id)
-            setRecados(recados.map(recado =>
-                recado.id === id ? updatedRecado : recado
-            ))
+
+            // Verificar se o recado retornado tem as relações necessárias
+            if (updatedRecado && updatedRecado.de && updatedRecado.para) {
+                setRecados(recados.map(recado =>
+                    recado.id === id ? updatedRecado : recado
+                ))
+            } else {
+                // Se o recado não tem as relações, recarregar a lista
+                console.warn('Recado retornado sem relações, recarregando lista...')
+                await loadRecados()
+            }
         } catch (err) {
             console.error('Erro ao marcar como lido:', err)
             alert('Erro ao marcar recado como lido')
+        } finally {
+            setMarkingAsReadId(null)
         }
     }
 
@@ -67,6 +87,11 @@ export default function RecadosPage() {
             hour: '2-digit',
             minute: '2-digit'
         })
+    }
+
+    // Função auxiliar para verificar se um recado é válido
+    const isValidRecado = (recado: Recado): boolean => {
+        return !!(recado && recado.de && recado.para && recado.de.nome && recado.para.nome)
     }
 
     if (loading) {
@@ -131,7 +156,7 @@ export default function RecadosPage() {
             </div>
 
             <div className="space-y-4">
-                {recados.map((recado) => (
+                {recados.filter(isValidRecado).map((recado) => (
                     <div
                         key={recado.id}
                         className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
@@ -149,12 +174,12 @@ export default function RecadosPage() {
                                         </h3>
                                         {!recado.lido && (
                                             <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                        Não lido
-                      </span>
+                                                Não lido
+                                            </span>
                                         )}
                                     </div>
                                     <p className="text-sm text-gray-600 mb-2">
-                                        De: <strong>{recado.de.nome}</strong> para <strong>{recado.para.nome}</strong> • {formatDate(recado.data)}
+                                        De: <strong>{recado.de?.nome || 'Nome não disponível'}</strong> para <strong>{recado.para?.nome || 'Nome não disponível'}</strong> • {formatDate(recado.data)}
                                     </p>
                                     {recado.texto.length > 100 && (
                                         <p className="text-gray-700 text-sm">
@@ -181,10 +206,11 @@ export default function RecadosPage() {
                                     {!recado.lido && (
                                         <button
                                             onClick={() => handleMarkAsRead(recado.id)}
-                                            className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-md transition-colors"
+                                            disabled={markingAsReadId === recado.id}
+                                            className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-md transition-colors disabled:opacity-50"
                                             title="Marcar como lido"
                                         >
-                                            ✓
+                                            {markingAsReadId === recado.id ? '...' : '✓'}
                                         </button>
                                     )}
                                     <button

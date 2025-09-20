@@ -1,14 +1,15 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, use } from "react"
 import { ArrowLeft, Save } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { pessoasService } from "@/services"
 import type { Pessoa, UpdatePessoaData } from "@/services"
 
-export default function EditarPessoaPage({ params }: { params: { id: string } }) {
+export default function EditarPessoaPage({ params }: { params: Promise<{ id: string }> }) {
     const router = useRouter()
+    const resolvedParams = use(params)
     const [pessoa, setPessoa] = useState<Pessoa | null>(null)
     const [formData, setFormData] = useState<UpdatePessoaData>({
         nome: "",
@@ -22,7 +23,7 @@ export default function EditarPessoaPage({ params }: { params: { id: string } })
         const loadPessoa = async () => {
             try {
                 setLoading(true)
-                const data = await pessoasService.getById(parseInt(params.id))
+                const data = await pessoasService.getById(parseInt(resolvedParams.id))
                 setPessoa(data)
                 setFormData({
                     nome: data.nome,
@@ -36,10 +37,10 @@ export default function EditarPessoaPage({ params }: { params: { id: string } })
             }
         }
 
-        if (params.id) {
+        if (resolvedParams.id) {
             loadPessoa()
         }
-    }, [params.id, router])
+    }, [resolvedParams.id, router])
 
     const validateForm = (): boolean => {
         const newErrors: Record<string, string> = {}
@@ -76,7 +77,7 @@ export default function EditarPessoaPage({ params }: { params: { id: string } })
             if (formData.nome?.trim()) updateData.nome = formData.nome.trim()
             if (formData.password?.trim()) updateData.password = formData.password
 
-            await pessoasService.update(parseInt(params.id), updateData)
+            await pessoasService.update(parseInt(resolvedParams.id), updateData)
             router.push("/pessoas")
         } catch (error: any) {
             console.error("Erro ao atualizar pessoa:", error)

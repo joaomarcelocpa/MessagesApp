@@ -1,14 +1,15 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, use } from "react"
 import { ArrowLeft, Edit, Trash2, MessageSquare, User, Calendar } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { recadosService } from "@/services"
 import type { Recado } from "@/services"
 
-export default function RecadoDetalhePage({ params }: { params: { id: string } }) {
+export default function RecadoDetalhePage({ params }: { params: Promise<{ id: string }> }) {
     const router = useRouter()
+    const resolvedParams = use(params)
     const [recado, setRecado] = useState<Recado | null>(null)
     const [loading, setLoading] = useState(true)
     const [deleting, setDeleting] = useState(false)
@@ -18,7 +19,7 @@ export default function RecadoDetalhePage({ params }: { params: { id: string } }
         const loadRecado = async () => {
             try {
                 setLoading(true)
-                const data = await recadosService.getById(parseInt(params.id))
+                const data = await recadosService.getById(parseInt(resolvedParams.id))
                 setRecado(data)
 
                 // Se o recado não foi lido, marca automaticamente como lido
@@ -41,10 +42,10 @@ export default function RecadoDetalhePage({ params }: { params: { id: string } }
             }
         }
 
-        if (params.id) {
+        if (resolvedParams.id) {
             loadRecado()
         }
-    }, [params.id, router])
+    }, [resolvedParams.id, router])
 
     const handleDelete = async () => {
         if (!recado || !confirm('Tem certeza que deseja excluir este recado?')) {
@@ -144,7 +145,7 @@ export default function RecadoDetalhePage({ params }: { params: { id: string } }
                     </div>
                     <div className="flex gap-2">
                         <Link
-                            href={`/recados/${params.id}/editar`}
+                            href={`/recados/${resolvedParams.id}/editar`}
                             className="border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-md font-medium transition-colors flex items-center gap-2"
                         >
                             <Edit className="h-4 w-4" />
@@ -200,8 +201,8 @@ export default function RecadoDetalhePage({ params }: { params: { id: string } }
                                     <User className="h-4 w-4 text-gray-500" />
                                     <h3 className="text-sm font-medium text-gray-500">Remetente</h3>
                                 </div>
-                                <p className="font-semibold text-lg text-gray-900">{recado.de.nome}</p>
-                                <p className="text-sm text-gray-600">ID: {recado.de.id}</p>
+                                <p className="font-semibold text-lg text-gray-900">{recado.de?.nome || 'Nome não disponível'}</p>
+                                <p className="text-sm text-gray-600">ID: {recado.de?.id || 'N/A'}</p>
                             </div>
 
                             <div className="bg-gray-50 rounded-lg p-4">
@@ -209,8 +210,8 @@ export default function RecadoDetalhePage({ params }: { params: { id: string } }
                                     <User className="h-4 w-4 text-gray-500" />
                                     <h3 className="text-sm font-medium text-gray-500">Destinatário</h3>
                                 </div>
-                                <p className="font-semibold text-lg text-gray-900">{recado.para.nome}</p>
-                                <p className="text-sm text-gray-600">ID: {recado.para.id}</p>
+                                <p className="font-semibold text-lg text-gray-900">{recado.para?.nome || 'Nome não disponível'}</p>
+                                <p className="text-sm text-gray-600">ID: {recado.para?.id || 'N/A'}</p>
                             </div>
                         </div>
 
@@ -243,7 +244,7 @@ export default function RecadoDetalhePage({ params }: { params: { id: string } }
                     <h3 className="text-lg font-semibold mb-4 text-gray-900">Ações</h3>
                     <div className="flex flex-wrap gap-2">
                         <Link
-                            href={`/recados/${params.id}/editar`}
+                            href={`/recados/${resolvedParams.id}/editar`}
                             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors flex items-center gap-2"
                         >
                             <Edit className="h-4 w-4" />

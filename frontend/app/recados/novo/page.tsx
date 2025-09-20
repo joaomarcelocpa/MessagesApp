@@ -243,7 +243,7 @@ export default function NovoRecadoPage() {
                                 placeholder="Digite a mensagem do recado"
                                 rows={4}
                                 required
-                                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                className={`w-full px-3 py-2 border rounded-md text-black shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                     errors.texto ? 'border-red-300' : 'border-gray-300'
                                 }`}
                             />
@@ -267,7 +267,7 @@ export default function NovoRecadoPage() {
                                     value={formData.deId}
                                     onChange={handleInputChange('deId')}
                                     required
-                                    className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                    className={`w-full px-3 py-2 border text-black rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                         errors.deId ? 'border-red-300' : 'border-gray-300'
                                     }`}
                                 >
@@ -292,7 +292,7 @@ export default function NovoRecadoPage() {
                                     value={formData.paraId}
                                     onChange={handleInputChange('paraId')}
                                     required
-                                    className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                    className={`w-full px-3 py-2 text-black border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                         errors.paraId ? 'border-red-300' : 'border-gray-300'
                                     }`}
                                 >
